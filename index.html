@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!-- iPad 离线版：由 tools/build-ipad.js 从电脑版的 index.html 生成，别直接改这个文件 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KPJ Game">
+<meta name="theme-color" content="#FDB11D">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1488x2266.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1536x2048.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1620x2160.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1640x2360.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1668x2224.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1668x2388.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-1668x2420.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-2048x2732.jpg">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/ipad-2064x2752.jpg">
+<title>KPJ Healthcare — Perjalanan Bermula! 翻牌配对</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="ipad.css">
+</head>
+<body>
+
+<div id="viewport">
+  <div id="stage">
+
+    <!-- ============ 1. 首页 ============ -->
+    <section class="page" id="page-home" data-page="home">
+      <img class="page-bg" src="assets/img/page-home.jpg" alt="">
+      <button class="sprite-btn" id="btn-start" aria-label="MULA">
+        <img src="assets/img/btn-mula.png" alt="MULA" draggable="false">
+      </button>
+    </section>
+
+    <!-- ============ 2. 游戏页面 ============ -->
+    <section class="page" id="page-game" data-page="game">
+      <img class="page-bg" src="assets/img/page-game-bg.jpg" alt="">
+      <!-- 计时数字画在 canvas 上：CSS 和 canvas 的字体度量对不齐，直接画才能跟设计稿的「15」对位 -->
+      <canvas id="timer" width="480" height="220"></canvas>
+      <div id="grid"></div>
+
+      <!-- 开局倒数：整屏压暗 + 3 / 2 / 1 / MULA! -->
+      <div id="countdown" hidden>
+        <div id="countdown-num">3</div>
+      </div>
+
+      <!-- 参考图模式（设定页「查看参考图」）才显示 -->
+      <button class="chip chip-back" id="btn-ref-back" data-i18n="btn.back">返回</button>
+    </section>
+
+    <!-- ============ 3a. 成功页面（点 TEBUS HADIAH 进最后一页） ============ -->
+    <section class="page page-result" id="page-success" data-page="success">
+      <img class="page-bg" src="assets/img/page-success.jpg" alt="">
+      <button class="sprite-btn" id="btn-success" data-next aria-label="TEBUS HADIAH">
+        <img src="assets/img/btn-tebus.png" alt="TEBUS HADIAH" draggable="false">
+      </button>
+    </section>
+
+    <!-- ============ 3b. 失败页面（点 CUBA LAGI 进最后一页） ============ -->
+    <section class="page page-result" id="page-fail" data-page="fail">
+      <img class="page-bg" src="assets/img/page-fail.jpg" alt="">
+      <button class="sprite-btn" id="btn-fail" data-next aria-label="CUBA LAGI">
+        <img src="assets/img/btn-cuba.png" alt="CUBA LAGI" draggable="false">
+      </button>
+    </section>
+
+    <!-- ============ 4. 最后一页（自动回首页） ============ -->
+    <section class="page page-result" id="page-last" data-page="last">
+      <img class="page-bg" src="assets/img/page-last.jpg" alt="">
+    </section>
+
+    <!-- ============ 设定页（双击右上角 / F2 进入） ============ -->
+    <section class="page" id="page-settings" data-page="settings">
+      <div class="set-wrap">
+        <header class="set-head">
+          <h1 data-i18n="set.title">设定</h1>
+          <div class="set-head-right">
+            <div id="lang-pick" class="seg"></div>
+            <button class="chip" id="set-close" data-i18n="set.close">关闭</button>
+          </div>
+        </header>
+
+        <div class="set-body">
+
+          <div class="set-card">
+            <h2 data-i18n="sec.time">一、时间</h2>
+            <div class="row">
+              <label for="cfg-time" data-i18n="lbl.time">游戏限时（秒）</label>
+              <input type="number" id="cfg-time" min="5" max="600" step="1" inputmode="numeric">
+            </div>
+            <div class="row">
+              <label for="cfg-count" data-i18n="lbl.countin">开局倒数（秒）</label>
+              <input type="number" id="cfg-count" min="0" max="10" step="1" inputmode="numeric">
+            </div>
+            <div class="row">
+              <label for="cfg-winpairs" data-i18n="lbl.winpairs">成功门槛（组）</label>
+              <input type="number" id="cfg-winpairs" min="1" max="6" step="1" inputmode="numeric">
+            </div>
+            <div class="row">
+              <label for="cfg-last" data-i18n="lbl.last">最后一页停留（秒）</label>
+              <input type="number" id="cfg-last" min="1" max="120" step="1" inputmode="numeric">
+            </div>
+            <div class="row">
+              <label for="cfg-result" data-i18n="lbl.result">结果页无人点击自动跳转（秒）</label>
+              <input type="number" id="cfg-result" min="0" max="600" step="1" inputmode="numeric">
+            </div>
+            <div class="row">
+              <label for="cfg-gotext" data-i18n="lbl.gotext">倒数结束的字样</label>
+              <input type="text" id="cfg-gotext" maxlength="12" autocomplete="off" spellcheck="false">
+            </div>
+            <p class="hint" data-i18n="hint.time"></p>
+          </div>
+
+          <div class="set-card">
+            <h2 data-i18n="sec.feel">二、翻牌手感</h2>
+            <div class="row">
+              <label for="cfg-flipms" data-i18n="lbl.flipms">翻牌动画</label>
+              <input type="range" id="cfg-flipms" min="100" max="800" step="20">
+              <span class="val" id="cfg-flipms-val"></span>
+            </div>
+            <div class="row">
+              <label for="cfg-matchhold" data-i18n="lbl.matchhold">配对成功停顿</label>
+              <input type="range" id="cfg-matchhold" min="0" max="800" step="20">
+              <span class="val" id="cfg-matchhold-val"></span>
+            </div>
+            <div class="row">
+              <label for="cfg-misshold" data-i18n="lbl.misshold">配对失败回翻</label>
+              <input type="range" id="cfg-misshold" min="200" max="2000" step="50">
+              <span class="val" id="cfg-misshold-val"></span>
+            </div>
+            <div class="row">
+              <label for="cfg-speedup" data-i18n="lbl.speedup">快点加速</label>
+              <input type="range" id="cfg-speedup" min="0" max="100" step="5">
+              <span class="val" id="cfg-speedup-val"></span>
+            </div>
+            <div class="row">
+              <label data-i18n="lbl.instant">抢先翻牌</label>
+              <div id="instant-pick" class="seg"></div>
+            </div>
+            <p class="hint" data-i18n="hint.feel"></p>
+          </div>
+
+          <div class="set-card">
+            <h2 data-i18n="sec.audio">三、音乐与音效</h2>
+
+            <div class="row audio-row" data-key="bgm">
+              <label data-i18n="lbl.bgm">背景音乐</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+            <div class="row">
+              <label data-i18n="lbl.bgmmode">背景音乐播放</label>
+              <div id="bgmmode-pick" class="seg"></div>
+            </div>
+
+            <div class="row audio-row" data-key="win">
+              <label data-i18n="lbl.win">成功页音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row audio-row" data-key="lose">
+              <label data-i18n="lbl.lose">失败页音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row audio-row" data-key="flip">
+              <label data-i18n="lbl.flip">翻牌音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row audio-row" data-key="miss">
+              <label data-i18n="lbl.miss">翻牌错误音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row audio-row" data-key="match">
+              <label data-i18n="lbl.match">配对成功音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row audio-row" data-key="click">
+              <label data-i18n="lbl.click">按钮音效</label>
+              <span class="fname"></span>
+              <button class="mini" data-play data-i18n="btn.play">试听</button>
+              <label class="mini file"><span data-i18n="btn.pick">选择</span><input type="file" accept="audio/*" data-pick></label>
+              <button class="mini danger" data-clear data-i18n="btn.clear">清除</button>
+            </div>
+
+            <div class="row">
+              <label for="cfg-vol" data-i18n="lbl.bgmvol">背景音乐音量</label>
+              <input type="range" id="cfg-vol" min="0" max="100" step="1">
+              <span class="val" id="cfg-vol-val">70%</span>
+            </div>
+            <div class="row">
+              <label for="cfg-sfxvol" data-i18n="lbl.sfxvol">音效音量</label>
+              <input type="range" id="cfg-sfxvol" min="0" max="100" step="1">
+              <span class="val" id="cfg-sfxvol-val">80%</span>
+            </div>
+            <p class="hint" data-i18n="hint.audio"></p>
+          </div>
+
+          <div class="set-card">
+            <h2 data-i18n="sec.faces">四、牌面图片（6 组）</h2>
+            <div id="face-grid"></div>
+            <div class="row">
+              <button class="chip" id="btn-faces-reset" data-i18n="btn.facesreset">恢复预设牌面</button>
+              <button class="chip" id="btn-ref" data-i18n="btn.ref">查看参考图</button>
+            </div>
+            <p class="hint" data-i18n="hint.faces"></p>
+          </div>
+
+          <div class="set-card">
+            <h2 data-i18n="sec.bundle">五、配置打包</h2>
+            <div class="row">
+              <span class="bundle-state" id="bundle-state"></span>
+            </div>
+            <div class="row">
+              <button class="chip" id="btn-export" data-i18n="btn.export">导出当前配置</button>
+              <button class="chip danger" id="btn-factory-reset" data-i18n="btn.factoryreset">恢复出厂设置</button>
+            </div>
+            <p class="hint" data-i18n="hint.bundle"></p>
+          </div>
+
+        </div>
+
+        <footer class="set-foot">
+          <button class="chip primary" id="set-save" data-i18n="set.save">保存并返回首页</button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- 右上角设定入口（双击 / 双击触屏） -->
+    <div id="settings-trigger" title="双击进入设定"></div>
+
+    <div id="toast"></div>
+  </div>
+</div>
+
+<script>window.KPJ_PLATFORM = 'ipad';</script>
+<script src="js/db.js"></script>
+<script src="js/bundle.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script src="ipad.js"></script>
+</body>
+</html>

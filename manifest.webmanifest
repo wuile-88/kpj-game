@@ -1,0 +1,29 @@
+{
+  "name": "KPJ Perjalanan Bermula",
+  "short_name": "KPJ Game",
+  "description": "KPJ Healthcare — Perjalanan Bermula! flip card game (offline)",
+  "lang": "ms",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDB11D",
+  "theme_color": "#FDB11D",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

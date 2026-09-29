@@ -1,0 +1,90 @@
+/* =========================================================
+   ipad.css — 只有 iPad 版会加载（tools/build-ipad.js 注入到 index.html）
+   画面本身和电脑版一模一样（1080 x 1920 设计稿整体等比缩放），这里只处理 iPad 的外框和触屏细节。
+   ========================================================= */
+
+/* iPad 屏幕是 3:4，设计稿是 9:16，左右会多出来一截。
+   用设计稿外框的黄 rgb(253,177,29) 填满 —— 看起来就是外框变宽了，不加任何别的东西。 */
+:root { --pillar: #FDB11D; }
+
+html, body {
+  background: var(--pillar);
+  overscroll-behavior: none;              /* 不要整页回弹 */
+  -webkit-touch-callout: none;            /* 长按图片不弹「存储图像 / 拷贝」菜单 */
+  -webkit-user-select: none; user-select: none;
+  -webkit-text-size-adjust: 100%;
+}
+body { position: fixed; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; touch-action: manipulation; }
+
+/* 舞台只放在安全区里：上面的状态栏、下面的主屏幕指示条那一条也用黄色填，不会压到画面 */
+#viewport {
+  top: env(safe-area-inset-top, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: env(safe-area-inset-left, 0px);
+  right: env(safe-area-inset-right, 0px);
+  overflow: hidden;
+}
+
+img { -webkit-touch-callout: none; -webkit-user-drag: none; }
+
+/* Safari 的 3D 翻牌：牌面里的图片自己也要隐藏背面，否则翻回去的那一瞬间会透出来 */
+.card-back, .card-front, .card-front img { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.card-inner { -webkit-transform-style: preserve-3d; transform-style: preserve-3d; }
+
+/* 设定页里的输入框要能选字、能长按粘贴 */
+input, textarea { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+.set-body { overscroll-behavior: contain; }
+
+/* ---------- Safari 里的「添加到主屏幕」引导（ipad.js；主屏幕 App 里不会出现） ---------- */
+#kpj-install {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000;
+  background: rgba(28, 18, 12, .74);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+#kpj-install .kpj-card {
+  width: 100%; max-width: 600px; background: #FBF6F0; color: #3B2A1E;
+  border-radius: 24px; padding: 26px 28px 22px; box-shadow: 0 6px 0 rgba(0,0,0,.25);
+  font-size: 18px; line-height: 1.5;
+}
+#kpj-install .kpj-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+#kpj-install .kpj-head img { width: 64px; height: 64px; border-radius: 15px; flex: none; }
+#kpj-install .kpj-head b { display: block; font-size: 26px; line-height: 1.2; }
+#kpj-install .kpj-head span { font-size: 17px; color: #6B4E3A; }
+#kpj-install ol { margin: 0; padding-left: 26px; }
+#kpj-install li { margin: 0 0 14px; }
+#kpj-install li b { font-size: 19px; }
+#kpj-install small { font-size: 14px; color: #6B4E3A; }
+#kpj-install .kpj-ico { display: inline-flex; vertical-align: middle; color: #1a73e8; margin-left: 4px; }
+#kpj-install .kpj-note { margin: 4px 0 14px; padding: 10px 14px; border-radius: 12px; background: #FDEBC4; font-weight: 700; text-align: center; }
+#kpj-install button {
+  display: block; margin: 0 auto; border: 0; background: none; color: #6B4E3A;
+  font: inherit; font-size: 15px; text-decoration: underline; padding: 8px 12px; cursor: pointer;
+}
+/* 指向 Safari 工具栏右上角「分享」的箭头 */
+#kpj-install .kpj-arrow {
+  position: absolute; top: 8px; right: 34px;
+  font: 700 54px/1 -apple-system, sans-serif; color: #FDB11D;
+  text-shadow: 0 3px 0 rgba(0,0,0,.35);
+  animation: kpjBob 1.1s ease-in-out infinite;
+}
+@keyframes kpjBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+/* ---------- 第一次从主屏幕打开时的离线进度（只出现一次） ---------- */
+#kpj-pill {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); z-index: 900;
+  transform: translateX(-50%); max-width: 92vw;
+  background: rgba(59, 42, 30, .94); color: #fff;
+  font: 600 16px/1.4 -apple-system, "PingFang SC", sans-serif;
+  padding: 10px 20px; border-radius: 999px; text-align: center; pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25); transition: opacity .5s ease;
+}
+#kpj-pill.ok { background: rgba(31, 122, 77, .96); }
+#kpj-pill.bad { background: rgba(180, 69, 58, .96); pointer-events: auto; }
+#kpj-pill.bye { opacity: 0; }
+
+/* 设定页「六、iPad 离线」卡片（ipad.js 生成） */
+#ipad-card .ipad-val { flex: 1 1 420px; font-size: 28px; font-weight: 600; line-height: 1.45; color: var(--brown); }
+#ipad-card .ipad-val.ok { color: #1f7a4d; }
+#ipad-card .ipad-val.warn { color: #B4453A; }
